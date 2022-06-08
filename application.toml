@@ -1,0 +1,11 @@
+[server]
+  port = 8080
+[datasource]
+  driver = "mysql"
+  host = "192.168.1.192"
+  port = "3306"
+  database = "mdm"
+  username = "food"
+  password = "food0563"
+  charset = "utf8mb4"
+  loc = "Asia/Shanghai"
