@@ -3,12 +3,12 @@ package menuservice
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"yishixincheng/grace-gin/dao/dtsdao"
 	"yishixincheng/grace-gin/dao/menudao"
 	"yishixincheng/grace-gin/entity/menuentity"
 	"yishixincheng/grace-gin/pkg/dbdriver"
 	"yishixincheng/grace-gin/vo/input/menuvo"
-	"strconv"
 )
 
 type MenuService struct {
@@ -39,7 +39,7 @@ func (s *MenuService) GetMenuList(request menuvo.IMenuListRequest) []menuentity.
 				}
 				dts := s.dtsDao.QueryById(int32(id))
 				menu.Dts = dts
-				// menu.ContentJson = s.getContentJson(menu)
+				menu.ContentJson = s.getContentJson(menu)
 			}
 			menuList = append(menuList, menu)
 		}
@@ -64,16 +64,17 @@ func (s *MenuService) getContentJson(menu menuentity.MenuEntity) string {
 		Host: menu.Dts.Ip,
 		Port: menu.Dts.Port,
 		Driver: "mysql",
-		Database: menu.Db,
+		Database: "mysql",
 		Password: menu.Password,
 		Username: menu.User,
 		Charset: "utf8mb4",
 		Loc: "Asia/Shanghai",
 	}
 	db := dbdriver.OpenConnect(config)
-	var result []map[string]interface{}
-	db.Raw(menu.TplSql).Scan(&result)
-
+	result, err := dbdriver.QueryTopMapSlice(db, "SELECT * FROM `ayi_live`.`admin` LIMIT 0,100")
+	if err != nil {
+		return ""
+	}
 	marshal, err := json.Marshal(result)
 	if err != nil {
 		return ""
